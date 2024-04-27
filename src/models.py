@@ -28,7 +28,7 @@ class User(db.Model):  # Definir una clase que hereda de la clase Model de SQLAl
     name = db.Column(db.String(80), unique=False, nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
     last_name = db.Column(db.String(80), unique=False, nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
 
-    favoritos = db.relationship("Favoritos", secondary=usuario_favoritos, back_populates="usuarios", primaryjoin=(usuario_favoritos.c.usuario_id == id))
+    favoritos = db.relationship("Favoritos", secondary=usuario_favoritos, back_populates="usuarios")
 
 
     # Método para representar un objeto de usuario como una cadena
@@ -69,7 +69,7 @@ class Favoritos(db.Model):
     planet = db.relationship("Planet", uselist=False, back_populates="favoritos")
 
 
-    usuarios = db.relationship("User", secondary=usuario_favoritos, back_populates="favoritos", primaryjoin=(usuario_favoritos.c.favorito_id == id))
+    usuarios = db.relationship("User", secondary=usuario_favoritos, back_populates="favoritos")
     # Definir una relación con las tablas de usuario a través de la tabla de asociación
 
 
@@ -77,8 +77,13 @@ class Favoritos(db.Model):
         return '<Favoritos %r>' % self.id  # Devolver una cadena que representa el objeto personaje
 
     def serialize(self):  # Método para serializar un objeto de personaje a un diccionario JSON
+        # Obtener los nombres de los usuarios asociados al favorito
+        nombres_usuarios = [usuario.name for usuario in self.usuarios]
+        id_usuarios = [usuario.id for usuario in self.usuarios]
+
         return {  # Devolver un diccionario con los atributos del personaje
             "id": self.id,
+            "usuario": [nombres_usuarios, id_usuarios],
             "film": self.film.title if self.film else None,
             "species": self.species.name if self.species else None,
             "starship": self.starship.name if self.starship else None,
@@ -366,7 +371,7 @@ class Character(db.Model):
     name = db.Column(db.String(80), nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
     eyes_color = db.Column(db.String(80), nullable=True)  # Definir una columna de tipo string con restricciones de no nulidad
     skin_color = db.Column(db.String(80), nullable=True)  # Definir una columna de tipo string con restricciones de no nulidad
-    gender = db.Column(db.String(10), nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
+    gender = db.Column(db.String(10), nullable=True)  # Definir una columna de tipo string con restricciones de no nulidad
     height = db.Column(db.String(10), nullable=True)  # Definir una columna de tipo string (opcional)
     mass = db.Column(db.String(10), nullable=True)  # Definir una columna de tipo string (opcional)
     hair_color = db.Column(db.String(80), nullable=True)  # Definir una columna de tipo string (opcional)
