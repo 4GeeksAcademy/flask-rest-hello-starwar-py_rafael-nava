@@ -8,12 +8,12 @@ import json
 db = SQLAlchemy()
 
 #Definimos la relacion de usuario y favorito en la tabla usuario_favoritos antes de cada tabla
-usuario_favoritos = db.Table('usuario_favoritos', db.metadata, #.metadata en SQLAlchemy es un objeto que almacena metadatos sobre las tablas y sus columnas en una base de datos. Aquí te explico cómo funciona
-                        # Columna 'usuario_id' para almacenar el ID del usuario que tiene el favorito
-                        db.Column('usuario_id', db.Integer, db.ForeignKey('user.id'),primary_key=True),
-                        # Columna 'favorito_id' para almacenar el ID del favorito asociado al usuario
-                        db.Column('favorito_id', db.Integer, db.ForeignKey('favoritos.id'),primary_key=True)
-)
+# usuario_favoritos = db.Table('usuario_favoritos', db.metadata, #.metadata en SQLAlchemy es un objeto que almacena metadatos sobre las tablas y sus columnas en una base de datos. Aquí te explico cómo funciona
+#                         # Columna 'usuario_id' para almacenar el ID del usuario que tiene el favorito
+#                         db.Column('usuario_id', db.Integer, db.ForeignKey('user.id'),primary_key=True),
+#                         # Columna 'favorito_id' para almacenar el ID del favorito asociado al usuario
+#                         db.Column('favorito_id', db.Integer, db.ForeignKey('favoritos.id'),primary_key=True)
+# )
 
 #------------------------------------------------------------------------USERS-------------------------------------------------------------
 
@@ -21,6 +21,7 @@ usuario_favoritos = db.Table('usuario_favoritos', db.metadata, #.metadata en SQL
 class User(db.Model):  # Definir una clase que hereda de la clase Model de SQLAlchemy
     # Definir las columnas de la tabla de usuarios
     id = db.Column(db.Integer, primary_key=True)  # Definir una columna de tipo entero como clave primaria
+    #favorito_id = db.Column(db.Integer, db.ForeignKey('favoritos.id'))  # Corrección: db.Column en lugar de db.column
     email = db.Column(db.String(120), unique=True, nullable=False)  # Definir una columna de tipo string con restricciones de unicidad y no nulidad
     password = db.Column(db.String(80), unique=False, nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)  # Definir una columna de tipo booleano con restricciones de no nulidad
@@ -28,7 +29,8 @@ class User(db.Model):  # Definir una clase que hereda de la clase Model de SQLAl
     name = db.Column(db.String(80), unique=False, nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
     last_name = db.Column(db.String(80), unique=False, nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
 
-    favoritos = db.relationship("Favoritos", secondary=usuario_favoritos, back_populates="usuarios")
+    # favoritos = db.relationship("Favoritos", secondary=usuario_favoritos, back_populates="usuarios")
+    favoritos = db.relationship("Favoritos", back_populates="usuarios")
 
 
     # Método para representar un objeto de usuario como una cadena
@@ -37,12 +39,15 @@ class User(db.Model):  # Definir una clase que hereda de la clase Model de SQLAl
 
     # Método para serializar un objeto de usuario a un diccionario JSON
     def serialize(self):  # Definir un método para serializar el objeto usuario
+        # nombres_favoritos = [favorito.serialize() for favorito in self.favoritos ]
         return {  # Devolver un diccionario con los atributos del usuario
             "id": self.id,
             "email": self.email,
             "username": self.username,
             "name": self.name, 
             "last_name": self.last_name
+            # "favoritos": nombres_favoritos,
+
         }
     
 #------------------------------------------------------------------------FAVORITOS-------------------------------------------------------------
@@ -50,7 +55,7 @@ class User(db.Model):  # Definir una clase que hereda de la clase Model de SQLAl
 class Favoritos(db.Model):
     # Definición de las columnas de la tabla de personajes
     id = db.Column(db.Integer, primary_key=True)  # Definir una columna de tipo entero como clave primaria
-
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # Corrección: db.Column en lugar de db.column
     film_id = db.Column(db.Integer, db.ForeignKey('film.id'))  # Definir una columna de clave foránea que referencia la tabla Film
     specie_id = db.Column(db.Integer, db.ForeignKey('species.id'))  # Definir una columna de clave foránea que referencia la tabla Film
     starship_id = db.Column(db.Integer, db.ForeignKey('starship.id'))  # Definir una columna de clave foránea que referencia la tabla Film
@@ -59,7 +64,7 @@ class Favoritos(db.Model):
     planet_id = db.Column(db.Integer, db.ForeignKey('planet.id'))  # Definir una columna de clave foránea que referencia la tabla Film
 
 
-    
+        
     # Relaciones con las tablas de elementos favoritos
     film = db.relationship("Film", uselist=False, back_populates="favoritos")
     species = db.relationship("Species", uselist=False, back_populates="favoritos")
@@ -69,7 +74,9 @@ class Favoritos(db.Model):
     planet = db.relationship("Planet", uselist=False, back_populates="favoritos")
 
 
-    usuarios = db.relationship("User", secondary=usuario_favoritos, back_populates="favoritos")
+    # usuarios = db.relationship("User", secondary=usuario_favoritos, back_populates="favoritos")
+    usuarios = db.relationship("User",  back_populates="favoritos")
+
     # Definir una relación con las tablas de usuario a través de la tabla de asociación
 
 
@@ -78,12 +85,12 @@ class Favoritos(db.Model):
 
     def serialize(self):  # Método para serializar un objeto de personaje a un diccionario JSON
         # Obtener los nombres de los usuarios asociados al favorito
-        nombres_usuarios = [usuario.name for usuario in self.usuarios]
-        id_usuarios = [usuario.id for usuario in self.usuarios]
+        # nombres_usuarios = [usuario.name for usuario in self.usuarios]
+        # id_usuarios = [usuario.id for usuario in self.usuarios]
 
         return {  # Devolver un diccionario con los atributos del personaje
             "id": self.id,
-            "usuario": [nombres_usuarios, id_usuarios],
+            # "usuario": nombres_usuarios,
             "film": self.film.title if self.film else None,
             "species": self.species.name if self.species else None,
             "starship": self.starship.name if self.starship else None,
@@ -309,7 +316,7 @@ class Species(db.Model):
             "hair_colors": self.hair_colors,
             "skin_colors": self.skin_colors,
             "language": self.language,
-            "homeworld": self.homeworld.name if self.film else None, #serialize() if self.homeworld else None,  # Serializar el planeta asociado al personaje si existe
+            "homeworld": self.homeworld.name if self.homeworld else None, #serialize() if self.homeworld else None,  # Serializar el planeta asociado al personaje si existe
             "created": self.created.strftime('%Y-%m-%d'),
             "edited": self.edited.strftime('%Y-%m-%d'),
             "url": self.url
@@ -400,7 +407,7 @@ class Character(db.Model):
             "mass": self.mass,
             "hair_color": self.hair_color,
             "birth_year": self.birth_year,
-            "homeworld": self.homeworld.name if self.film else None, #serialize() if self.homeworld else None,  # Serializar el planeta asociado al personaje si existe
+            "homeworld": self.homeworld.name if self.homeworld else None, #serialize() if self.homeworld else None,  # Serializar el planeta asociado al personaje si existe
             "url": self.url,
             "created": self.created.strftime('%Y-%m-%d'),  # Formatear la fecha de creación '%Y-%m-%dT%H:%M:%S.%fZ'
             "edited": self.edited.strftime('%Y-%m-%d'),  # Formatear la fecha de edición

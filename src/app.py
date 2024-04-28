@@ -46,13 +46,12 @@ def get_users():
         if not users:
             return jsonify({'message': 'No users found'}), 404
         
-        response_body = [{'id': user.id, 'name': user.name} for user in users]
+        response_body = [user.serialize() for user in users]
         return jsonify(response_body), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
 
-
+ #-------------------CONSULTAR TODOS LOS FAV -----------------------
 @app.route('/favoritos', methods=['GET'])
 def get_favorites():
     try:
@@ -66,8 +65,6 @@ def get_favorites():
         return jsonify(serialized_favoritos), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
 
  #-------------------CONSULTAR FAV DEL UN USUARIO-----------------------
  #https://fantastic-umbrella-695qvg7q9qvh5v9-3000.app.github.dev/users/favoritos?user_id=1
@@ -89,8 +86,7 @@ def get_user_favorites():
         return jsonify({'error': str(e)}), 500
     
 
-#-------------------METODO POST DE UN USUARIO-----------------------
-
+#-------------------METODO POST USUARIO FAVORITO PLANET-----------------------
 
 @app.route('/favorite/planet/<int:planet_id>', methods=['POST'])  # Define un endpoint para agregar un planeta favorito mediante una solicitud POST a la ruta '/favorite/planet/<planet_id>'
 def add_favorite_planet(planet_id):  # Define la función que manejará la solicitud, tomando el ID del planeta como argumento
@@ -111,12 +107,44 @@ def add_favorite_planet(planet_id):  # Define la función que manejará la solic
         if not planet:  # Verifica si el planeta no fue encontrado en la base de datos
             return jsonify({'error': 'Planet not found'}), 404  # Devuelve un error con código de estado 404 si el planeta no fue encontrado
 
-        user.favoritos.append(planet)  # Agrega el planeta a la lista de favoritos del usuario
+        new_favorite = Favoritos(user_id = user_id, planet_id = planet_id)
+        db.session.add(new_favorite)
         db.session.commit()  # Confirma los cambios en la base de datos
 
         return jsonify({'message': 'Planet added to favorites'}), 201  # Devuelve un mensaje de éxito con código de estado 201
     except Exception as e:  # Captura cualquier excepción que pueda ocurrir durante la ejecución del bloque try
         return jsonify({'error': str(e)}), 500  # Devuelve un error con código de estado 500 si ocurre una excepción, convirtiendo la excepción en una cadena de texto para la respuesta JSON
+
+
+#-------------------METODO POST USUARIO FAVORITO CHARACTER-----------------------
+
+@app.route('/favorite/character/<int:character_id>', methods=['POST'])  # Define un endpoint para agregar un character favorito mediante una solicitud POST a la ruta '/favorite/planet/<planet_id>'
+def add_favorite_character(character_id):  # Define la función que manejará la solicitud, tomando el ID del character como argumento
+    try:  # Inicia un bloque try para manejar excepciones que puedan ocurrir durante la ejecución del código
+        data = request.json  # Obtiene los datos JSON enviados en la solicitud
+        if not data:  # Verifica si no se proporcionaron datos JSON
+            return jsonify({'error': 'No data provided'}), 400  # Devuelve un error con código de estado 400 si no se proporcionaron datos
+
+        user_id = data.get('user_id')  # Obtiene el ID del usuario de los datos JSON
+        if not user_id:  # Verifica si no se proporcionó el ID del usuario
+            return jsonify({'error': 'User ID is required'}), 400  # Devuelve un error con código de estado 400 si el ID del usuario no está presente
+
+        user = User.query.get(user_id)  # Busca el usuario en la base de datos utilizando su ID
+        if not user:  # Verifica si el usuario no fue encontrado en la base de datos
+            return jsonify({'error': 'User not found'}), 404  # Devuelve un error con código de estado 404 si el usuario no fue encontrado
+
+        character = Character.query.get(character_id)  # Busca el planeta en la base de datos utilizando su ID
+        if not character:  # Verifica si el planeta no fue encontrado en la base de datos
+            return jsonify({'error': 'character not found'}), 404  # Devuelve un error con código de estado 404 si el character no fue encontrado
+
+        new_favorite = Favoritos(user_id = user_id, character_id = character_id)
+        db.session.add(new_favorite)
+        db.session.commit()  # Confirma los cambios en la base de datos
+
+        return jsonify({'message': 'character added to favorites'}), 201  # Devuelve un mensaje de éxito con código de estado 201
+    except Exception as e:  # Captura cualquier excepción que pueda ocurrir durante la ejecución del bloque try
+        return jsonify({'error': str(e)}), 500  # Devuelve un error con código de estado 500 si ocurre una excepción, convirtiendo la excepción en una cadena de texto para la respuesta JSON
+
 
 
 
