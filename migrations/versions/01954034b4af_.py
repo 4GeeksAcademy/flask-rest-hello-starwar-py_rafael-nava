@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 28c0ed97f2e1
+Revision ID: 01954034b4af
 Revises: 
-Create Date: 2024-04-27 01:50:15.025597
+Create Date: 2024-04-29 03:31:51.709645
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '28c0ed97f2e1'
+revision = '01954034b4af'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,12 +22,12 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
     sa.Column('episode_id', sa.Integer(), nullable=False),
-    sa.Column('director', sa.String(length=255), nullable=False),
-    sa.Column('opening_crawl', sa.Text(), nullable=False),
-    sa.Column('producer', sa.String(length=255), nullable=False),
-    sa.Column('release_date', sa.Date(), nullable=False),
-    sa.Column('created', sa.DateTime(), nullable=False),
-    sa.Column('edited', sa.DateTime(), nullable=False),
+    sa.Column('director', sa.String(length=255), nullable=True),
+    sa.Column('opening_crawl', sa.Text(), nullable=True),
+    sa.Column('producer', sa.String(length=255), nullable=True),
+    sa.Column('release_date', sa.Date(), nullable=True),
+    sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('edited', sa.DateTime(), nullable=True),
     sa.Column('url', sa.String(length=255), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('url')
@@ -35,56 +35,38 @@ def upgrade():
     op.create_table('planet',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
-    sa.Column('diameter', sa.String(length=50), nullable=False),
-    sa.Column('rotation_period', sa.String(length=50), nullable=False),
-    sa.Column('orbital_period', sa.String(length=50), nullable=False),
-    sa.Column('gravity', sa.String(length=50), nullable=False),
-    sa.Column('population', sa.String(length=50), nullable=False),
-    sa.Column('climate', sa.String(length=255), nullable=False),
-    sa.Column('terrain', sa.String(length=255), nullable=False),
-    sa.Column('surface_water', sa.String(length=50), nullable=False),
-    sa.Column('created', sa.DateTime(), nullable=False),
-    sa.Column('edited', sa.DateTime(), nullable=False),
-    sa.Column('url', sa.String(length=255), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('url')
-    )
-    op.create_table('species',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=255), nullable=False),
-    sa.Column('classification', sa.String(length=255), nullable=False),
-    sa.Column('designation', sa.String(length=255), nullable=False),
-    sa.Column('average_height', sa.String(length=50), nullable=False),
-    sa.Column('average_lifespan', sa.String(length=50), nullable=False),
-    sa.Column('eye_colors', sa.String(length=255), nullable=False),
-    sa.Column('hair_colors', sa.String(length=255), nullable=False),
-    sa.Column('skin_colors', sa.String(length=255), nullable=False),
-    sa.Column('language', sa.String(length=255), nullable=False),
-    sa.Column('homeworld', sa.String(length=255), nullable=False),
-    sa.Column('created', sa.DateTime(), nullable=False),
-    sa.Column('edited', sa.DateTime(), nullable=False),
-    sa.Column('url', sa.String(length=255), nullable=False),
+    sa.Column('diameter', sa.String(length=50), nullable=True),
+    sa.Column('rotation_period', sa.String(length=50), nullable=True),
+    sa.Column('orbital_period', sa.String(length=50), nullable=True),
+    sa.Column('gravity', sa.String(length=50), nullable=True),
+    sa.Column('population', sa.String(length=50), nullable=True),
+    sa.Column('climate', sa.String(length=255), nullable=True),
+    sa.Column('terrain', sa.String(length=255), nullable=True),
+    sa.Column('surface_water', sa.String(length=50), nullable=True),
+    sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('edited', sa.DateTime(), nullable=True),
+    sa.Column('url', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('url')
     )
     op.create_table('starship',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
-    sa.Column('model', sa.String(length=255), nullable=False),
-    sa.Column('starship_class', sa.String(length=255), nullable=False),
-    sa.Column('manufacturer', sa.String(length=255), nullable=False),
-    sa.Column('cost_in_credits', sa.String(length=50), nullable=False),
-    sa.Column('length', sa.String(length=50), nullable=False),
-    sa.Column('crew', sa.String(length=50), nullable=False),
-    sa.Column('passengers', sa.String(length=50), nullable=False),
-    sa.Column('max_atmosphering_speed', sa.String(length=50), nullable=False),
-    sa.Column('hyperdrive_rating', sa.String(length=50), nullable=False),
-    sa.Column('MGLT', sa.String(length=50), nullable=False),
-    sa.Column('cargo_capacity', sa.String(length=50), nullable=False),
-    sa.Column('consumables', sa.String(length=50), nullable=False),
-    sa.Column('created', sa.DateTime(), nullable=False),
-    sa.Column('edited', sa.DateTime(), nullable=False),
-    sa.Column('url', sa.String(length=255), nullable=False),
+    sa.Column('model', sa.String(length=255), nullable=True),
+    sa.Column('starship_class', sa.String(length=255), nullable=True),
+    sa.Column('manufacturer', sa.String(length=255), nullable=True),
+    sa.Column('cost_in_credits', sa.String(length=50), nullable=True),
+    sa.Column('length', sa.String(length=50), nullable=True),
+    sa.Column('crew', sa.String(length=50), nullable=True),
+    sa.Column('passengers', sa.String(length=50), nullable=True),
+    sa.Column('max_atmosphering_speed', sa.String(length=50), nullable=True),
+    sa.Column('hyperdrive_rating', sa.String(length=50), nullable=True),
+    sa.Column('MGLT', sa.String(length=50), nullable=True),
+    sa.Column('cargo_capacity', sa.String(length=50), nullable=True),
+    sa.Column('consumables', sa.String(length=50), nullable=True),
+    sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('edited', sa.DateTime(), nullable=True),
+    sa.Column('url', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('url')
     )
@@ -104,27 +86,27 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('model', sa.String(length=255), nullable=False),
-    sa.Column('vehicle_class', sa.String(length=255), nullable=False),
-    sa.Column('manufacturer', sa.String(length=255), nullable=False),
-    sa.Column('cost_in_credits', sa.String(length=50), nullable=False),
-    sa.Column('length', sa.String(length=50), nullable=False),
-    sa.Column('crew', sa.String(length=50), nullable=False),
+    sa.Column('vehicle_class', sa.String(length=255), nullable=True),
+    sa.Column('manufacturer', sa.String(length=255), nullable=True),
+    sa.Column('cost_in_credits', sa.String(length=50), nullable=True),
+    sa.Column('length', sa.String(length=50), nullable=True),
+    sa.Column('crew', sa.String(length=50), nullable=True),
     sa.Column('passengers', sa.String(length=50), nullable=False),
-    sa.Column('max_atmosphering_speed', sa.String(length=50), nullable=False),
-    sa.Column('cargo_capacity', sa.String(length=50), nullable=False),
-    sa.Column('consumables', sa.String(length=50), nullable=False),
-    sa.Column('created', sa.DateTime(), nullable=False),
-    sa.Column('edited', sa.DateTime(), nullable=False),
-    sa.Column('url', sa.String(length=255), nullable=False),
+    sa.Column('max_atmosphering_speed', sa.String(length=50), nullable=True),
+    sa.Column('cargo_capacity', sa.String(length=50), nullable=True),
+    sa.Column('consumables', sa.String(length=50), nullable=True),
+    sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('edited', sa.DateTime(), nullable=True),
+    sa.Column('url', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('url')
     )
     op.create_table('character',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=80), nullable=False),
-    sa.Column('eyes_color', sa.String(length=80), nullable=False),
-    sa.Column('skin_color', sa.String(length=80), nullable=False),
-    sa.Column('gender', sa.String(length=10), nullable=False),
+    sa.Column('eyes_color', sa.String(length=80), nullable=True),
+    sa.Column('skin_color', sa.String(length=80), nullable=True),
+    sa.Column('gender', sa.String(length=10), nullable=True),
     sa.Column('height', sa.String(length=10), nullable=True),
     sa.Column('mass', sa.String(length=10), nullable=True),
     sa.Column('hair_color', sa.String(length=80), nullable=True),
@@ -145,12 +127,24 @@ def upgrade():
     sa.ForeignKeyConstraint(['planet_id'], ['planet.id'], ),
     sa.PrimaryKeyConstraint('film_id', 'planet_id')
     )
-    op.create_table('species_films',
-    sa.Column('species_id', sa.Integer(), nullable=False),
-    sa.Column('film_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['film_id'], ['film.id'], ),
-    sa.ForeignKeyConstraint(['species_id'], ['species.id'], ),
-    sa.PrimaryKeyConstraint('species_id', 'film_id')
+    op.create_table('species',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('classification', sa.String(length=255), nullable=True),
+    sa.Column('designation', sa.String(length=255), nullable=True),
+    sa.Column('average_height', sa.String(length=50), nullable=True),
+    sa.Column('average_lifespan', sa.String(length=50), nullable=True),
+    sa.Column('eye_colors', sa.String(length=255), nullable=True),
+    sa.Column('hair_colors', sa.String(length=255), nullable=True),
+    sa.Column('skin_colors', sa.String(length=255), nullable=True),
+    sa.Column('language', sa.String(length=255), nullable=False),
+    sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('edited', sa.DateTime(), nullable=True),
+    sa.Column('homeworld_id', sa.Integer(), nullable=True),
+    sa.Column('url', sa.String(length=255), nullable=True),
+    sa.ForeignKeyConstraint(['homeworld_id'], ['planet.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('url')
     )
     op.create_table('starships_films',
     sa.Column('starship_id', sa.Integer(), nullable=False),
@@ -168,8 +162,7 @@ def upgrade():
     )
     op.create_table('favoritos',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('tipo', sa.String(length=80), nullable=False),
-    sa.Column('elemento_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('film_id', sa.Integer(), nullable=True),
     sa.Column('specie_id', sa.Integer(), nullable=True),
     sa.Column('starship_id', sa.Integer(), nullable=True),
@@ -181,32 +174,32 @@ def upgrade():
     sa.ForeignKeyConstraint(['planet_id'], ['planet.id'], ),
     sa.ForeignKeyConstraint(['specie_id'], ['species.id'], ),
     sa.ForeignKeyConstraint(['starship_id'], ['starship.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.ForeignKeyConstraint(['vehicle_id'], ['vehicle.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('usuario_favoritos',
-    sa.Column('usuario_id', sa.Integer(), nullable=False),
-    sa.Column('favorito_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['favorito_id'], ['favoritos.id'], ),
-    sa.ForeignKeyConstraint(['usuario_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('usuario_id', 'favorito_id')
+    op.create_table('species_films',
+    sa.Column('species_id', sa.Integer(), nullable=False),
+    sa.Column('film_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['film_id'], ['film.id'], ),
+    sa.ForeignKeyConstraint(['species_id'], ['species.id'], ),
+    sa.PrimaryKeyConstraint('species_id', 'film_id')
     )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('usuario_favoritos')
+    op.drop_table('species_films')
     op.drop_table('favoritos')
     op.drop_table('vehicles_films')
     op.drop_table('starships_films')
-    op.drop_table('species_films')
+    op.drop_table('species')
     op.drop_table('films_planets')
     op.drop_table('character')
     op.drop_table('vehicle')
     op.drop_table('user')
     op.drop_table('starship')
-    op.drop_table('species')
     op.drop_table('planet')
     op.drop_table('film')
     # ### end Alembic commands ###

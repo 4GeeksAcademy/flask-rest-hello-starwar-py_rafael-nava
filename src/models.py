@@ -368,7 +368,7 @@ class Planet(db.Model):
 
 
 #------------------------------------------------------------------------CHARACTER-------------------------------------------------------------
-
+############CAMBIAR EL NOMBRE DE LA COLUMNA DE EYES_COLOR A EYE_COLOR
 
 # Definición de la clase Character que representa un personaje
 class Character(db.Model):
@@ -399,7 +399,7 @@ class Character(db.Model):
         return {  # Devolver un diccionario con los atributos del personaje
             "id": self.id,
             "name": self.name,
-            "eye_color": self.eyes_color,
+            "eyes_color": self.eyes_color,
             "skin_color": self.skin_color,
             "gender": self.gender,
             "height": self.height,
