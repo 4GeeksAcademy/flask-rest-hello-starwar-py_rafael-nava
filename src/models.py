@@ -368,14 +368,13 @@ class Planet(db.Model):
 
 
 #------------------------------------------------------------------------CHARACTER-------------------------------------------------------------
-############CAMBIAR EL NOMBRE DE LA COLUMNA DE EYES_COLOR A EYE_COLOR
 
 # Definición de la clase Character que representa un personaje
 class Character(db.Model):
     # Definición de las columnas de la tabla de personajes
     id = db.Column(db.Integer, primary_key=True)  # Definir una columna de tipo entero como clave primaria
     name = db.Column(db.String(80), nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
-    eyes_color = db.Column(db.String(80), nullable=True)  # Definir una columna de tipo string con restricciones de no nulidad
+    eye_color = db.Column(db.String(80), nullable=True)  # Definir una columna de tipo string con restricciones de no nulidad
     skin_color = db.Column(db.String(80), nullable=True)  # Definir una columna de tipo string con restricciones de no nulidad
     gender = db.Column(db.String(10), nullable=True)  # Definir una columna de tipo string con restricciones de no nulidad
     height = db.Column(db.String(10), nullable=True)  # Definir una columna de tipo string (opcional)
@@ -399,7 +398,7 @@ class Character(db.Model):
         return {  # Devolver un diccionario con los atributos del personaje
             "id": self.id,
             "name": self.name,
-            "eyes_color": self.eyes_color,
+            "eye_color": self.eye_color,
             "skin_color": self.skin_color,
             "gender": self.gender,
             "height": self.height,

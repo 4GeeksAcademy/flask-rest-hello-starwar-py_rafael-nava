@@ -37,6 +37,25 @@ def sitemap():
     return generate_sitemap(app)
 
 #------------------------------------------------------------------------USERS-------------------------------------------------------------
+#-------------------CREATE USER-----------------------
+@app.route('/users', methods=['POST'])  # Define un endpoint para agregar un nuevo personaje mediante una solicitud POST a la ruta '/users'
+def create_new_user():  # Define la función que manejará la solicitud
+    data = request.json  # Obtén los datos JSON enviados en la solicitud
+    if not data:  # Verifica si no se proporcionaron datos JSON
+        return jsonify({'error': 'No data provided'}), 400  # Devuelve un error con código de estado 400 si no se proporcionaron datos
+
+    # Crear un nuevo objeto User y asignar los valores del JSON
+    new_user = User()  # Crea una nueva instancia de la clase User
+    for key, value in data.items():  #items() para iterar sobre cada par llave-valor en el JSON recibido
+        if hasattr(new_user, key):  # Verifica si el campo existe en el modelo de User
+            setattr(new_user, key, value)  # Asigna el valor del campo al objeto User utilizando setattr
+
+    # Agregar el nuevo user a la base de datos
+    db.session.add(new_user)  # Agrega el objeto User a la sesión de la base de datos
+    db.session.commit()  # Confirma los cambios en la base de datos
+
+    return jsonify({'message': 'New user created successfully', 'user_id': new_user.id}), 201  # Devuelve un mensaje de éxito con el ID del nuevo usuario y un código de estado 201
+
 
 #-------------------CONSULTAR TODOS LOS USUARIOS-----------------------
 @app.route('/users', methods=['GET'])
