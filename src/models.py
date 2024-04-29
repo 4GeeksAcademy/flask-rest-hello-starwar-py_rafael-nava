@@ -39,14 +39,13 @@ class User(db.Model):  # Definir una clase que hereda de la clase Model de SQLAl
 
     # Método para serializar un objeto de usuario a un diccionario JSON
     def serialize(self):  # Definir un método para serializar el objeto usuario
-        # nombres_favoritos = [favorito.serialize() for favorito in self.favoritos ]
         return {  # Devolver un diccionario con los atributos del usuario
             "id": self.id,
             "email": self.email,
             "username": self.username,
             "name": self.name, 
-            "last_name": self.last_name
-            # "favoritos": nombres_favoritos,
+            "last_name": self.last_name,
+            "favoritos": [favorito.serialize() for favorito in self.favoritos]  # Serializar cada favorito en la lista
 
         }
     
@@ -400,7 +399,7 @@ class Character(db.Model):
         return {  # Devolver un diccionario con los atributos del personaje
             "id": self.id,
             "name": self.name,
-            "eyes_color": self.eyes_color,
+            "eye_color": self.eyes_color,
             "skin_color": self.skin_color,
             "gender": self.gender,
             "height": self.height,

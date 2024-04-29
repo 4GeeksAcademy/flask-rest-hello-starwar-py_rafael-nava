@@ -146,37 +146,86 @@ def add_favorite_character(character_id):  # Define la función que manejará la
         return jsonify({'error': str(e)}), 500  # Devuelve un error con código de estado 500 si ocurre una excepción, convirtiendo la excepción en una cadena de texto para la respuesta JSON
 
 
-
-
-
-#-------------------METODO DELETE DE UN USUARIO-----------------------
+#-------------------METODO DELETE PLANET DE UN USUARIO-----------------------
 
 @app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
-def delete_favorite_planet(planet_id):
+def remove_favorite_planet(planet_id):
     try:
-        # Obtener el ID del usuario del JSON de la solicitud
-        user_id = request.json.get('user_id')
-        if not user_id:  # Verificar si no se proporcionó el ID del usuario
-            return jsonify({'message': 'User ID is required'}), 400  # Devolver un error con código de estado 400 si el ID del usuario no está presente
-        
-        # Buscar al usuario en la base de datos utilizando su ID
+        # Obtiene los datos JSON enviados en la solicitud
+        data = request.json
+        # Verifica si no se proporcionaron datos JSON
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        # Obtiene el ID del usuario de los datos JSON
+        user_id = data.get('user_id')
+        # Verifica si no se proporcionó el ID del usuario
+        if not user_id:
+            return jsonify({'error': 'User ID is required'}), 400
+
+        # Busca el usuario en la base de datos utilizando su ID
         user = User.query.get(user_id)
-        if not user:  # Verificar si el usuario no fue encontrado en la base de datos
-            return jsonify({'message': 'User not found'}), 404  # Devolver un error con código de estado 404 si el usuario no fue encontrado
-        
-        # Buscar el planeta en la base de datos utilizando su ID
-        planet = Planet.query.get(planet_id)
-        if not planet:  # Verificar si el planeta no fue encontrado en la base de datos
-            return jsonify({'message': 'Planet not found'}), 404  # Devolver un error con código de estado 404 si el planeta no fue encontrado
-        
-        if planet in user.favoritos:  # Verificar si el planeta está en la lista de favoritos del usuario
-            user.favoritos.remove(planet)  # Eliminar el planeta de la lista de favoritos del usuario
-            db.session.commit()  # Confirmar los cambios en la base de datos
-            return jsonify({'message': 'Planet removed from favorites'}), 200  # Devolver un mensaje de éxito con código de estado 200
-        else:
-            return jsonify({'message': 'Planet is not in favorites'}), 404  # Devolver un error con código de estado 404 si el planeta no está en la lista de favoritos del usuario
-    except Exception as e:  # Capturar cualquier excepción que pueda ocurrir durante la ejecución del bloque try
-        return jsonify({'error': str(e)}), 500  # Devolver un error con código de estado 500 si ocurre una excepción, convirtiendo la excepción en una cadena de texto para la respuesta JSON
+        # Verifica si el usuario no fue encontrado en la base de datos
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Busca el favorito correspondiente al usuario y al planeta específico en la base de datos
+        favorite = Favoritos.query.filter_by(user_id=user_id, planet_id=planet_id).first()
+        # Verifica si el favorito no fue encontrado en la base de datos
+        if not favorite:
+            return jsonify({'error': 'Favorite not found'}), 404
+
+        # Elimina el favorito de la base de datos
+        db.session.delete(favorite)
+        # Confirma los cambios en la base de datos
+        db.session.commit()
+
+        # Devuelve un mensaje de éxito con código de estado 200
+        return jsonify({'message': 'Favorite planet removed successfully'}), 200
+    except Exception as e:
+        # Devuelve un error con código de estado 500 si ocurre una excepción
+        return jsonify({'error': str(e)}), 500
+
+
+#-------------------METODO DELETE CHARACTERS DE UN USUARIO-----------------------
+
+@app.route('/favorite/character/<int:character_id>', methods=['DELETE'])
+def remove_favorite_character(character_id):
+    try:
+        # Obtiene los datos JSON enviados en la solicitud
+        data = request.json
+        # Verifica si no se proporcionaron datos JSON
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        # Obtiene el ID del usuario de los datos JSON
+        user_id = data.get('user_id')
+        # Verifica si no se proporcionó el ID del usuario
+        if not user_id:
+            return jsonify({'error': 'User ID is required'}), 400
+
+        # Busca el usuario en la base de datos utilizando su ID
+        user = User.query.get(user_id)
+        # Verifica si el usuario no fue encontrado en la base de datos
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        # Busca el favorito correspondiente al usuario y al planeta específico en la base de datos
+        favorite = Favoritos.query.filter_by(user_id=user_id, character_id=character_id).first()
+        # Verifica si el favorito no fue encontrado en la base de datos
+        if not favorite:
+            return jsonify({'error': 'Favorite not found'}), 404
+
+        # Elimina el favorito de la base de datos
+        db.session.delete(favorite)
+        # Confirma los cambios en la base de datos
+        db.session.commit()
+
+        # Devuelve un mensaje de éxito con código de estado 200
+        return jsonify({'message': 'Favorite character removed successfully'}), 200
+    except Exception as e:
+        # Devuelve un error con código de estado 500 si ocurre una excepción
+        return jsonify({'error': str(e)}), 500
 
 
 #-----------------------------------------------------------METODOS PARA CHARACTERS-------------------------------------------------------------
