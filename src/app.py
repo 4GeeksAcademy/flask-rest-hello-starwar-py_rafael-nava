@@ -38,24 +38,38 @@ def sitemap():
 
 #------------------------------------------------------------------------USERS-------------------------------------------------------------
 #-------------------CREATE USER-----------------------
-@app.route('/users', methods=['POST'])  # Define un endpoint para agregar un nuevo personaje mediante una solicitud POST a la ruta '/users'
+@app.route('/users', methods=['POST'])  # Define un endpoint para agregar un nuevo usuario mediante una solicitud POST a la ruta '/users'
 def create_new_user():  # Define la función que manejará la solicitud
-    data = request.json  # Obtén los datos JSON enviados en la solicitud
-    if not data:  # Verifica si no se proporcionaron datos JSON
-        return jsonify({'error': 'No data provided'}), 400  # Devuelve un error con código de estado 400 si no se proporcionaron datos
+    try:  # Inicia un bloque try para manejar posibles excepciones
+        data = request.json  # Obtén los datos JSON enviados en la solicitud
+        if not data:  # Verifica si no se proporcionaron datos JSON
+            return jsonify({'error': 'No data provided'}), 400  # Devuelve un error con código de estado 400 si no se proporcionaron datos
 
-    # Crear un nuevo objeto User y asignar los valores del JSON
-    new_user = User()  # Crea una nueva instancia de la clase User
-    for key, value in data.items():  #items() para iterar sobre cada par llave-valor en el JSON recibido
-        if hasattr(new_user, key):  # Verifica si el campo existe en el modelo de User
-            setattr(new_user, key, value)  # Asigna el valor del campo al objeto User utilizando setattr
+        if 'email' not in data:  # Verifica si 'email' no está presente en los datos JSON
+            return jsonify({'error': 'Email is required'}), 400  # Devuelve un error con código de estado 400 si 'email' no está presente
 
-    # Agregar el nuevo user a la base de datos
-    db.session.add(new_user)  # Agrega el objeto User a la sesión de la base de datos
-    db.session.commit()  # Confirma los cambios en la base de datos
+        if 'username' not in data:  # Verifica si 'username' no está presente en los datos JSON
+            return jsonify({'error': 'Username is required'}), 400  # Devuelve un error con código de estado 400 si 'username' no está presente
 
-    return jsonify({'message': 'New user created successfully', 'user_id': new_user.id}), 201  # Devuelve un mensaje de éxito con el ID del nuevo usuario y un código de estado 201
+        if 'password' not in data:  # Verifica si 'password' no está presente en los datos JSON
+            return jsonify({'error': 'Password is required'}), 400  # Devuelve un error con código de estado 400 si 'password' no está presente
 
+        existing_user = User.query.filter_by(email=data['email']).first()  # Busca un usuario en la base de datos con el mismo email
+        if existing_user:  # Verifica si ya existe un usuario con el mismo email
+            return jsonify({'error': 'Email already exists.'}), 409  # Devuelve un error con código de estado 409 si ya existe un usuario con el mismo email
+
+        existing_username = User.query.filter_by(username=data['username']).first()  # Busca un usuario en la base de datos con el mismo username
+        if existing_username:  # Verifica si ya existe un usuario con el mismo username
+            return jsonify({'error': 'Username already exists.'}), 409  # Devuelve un error con código de estado 409 si ya existe un usuario con el mismo username
+
+        new_user = User(email=data['email'], password=data['password'], name=data.get('name'), last_name=data.get('last_name'), username=data.get('username'))  # Crea un nuevo usuario con los datos proporcionados
+
+        db.session.add(new_user)  # Agrega el nuevo usuario a la sesión de la base de datos
+        db.session.commit()  # Confirma los cambios en la base de datos
+        return jsonify({'message': 'New user created successfully', 'user_id': new_user.id}), 201  # Devuelve un mensaje de éxito con el ID del nuevo usuario y un código de estado 201
+   
+    except Exception as e:  # Captura cualquier excepción que ocurra dentro del bloque try
+        return jsonify({'error': 'Error in user creation: ' + str(e)}), 500  # Devuelve un mensaje de error con un código de estado HTTP 500 si ocurre una excepción durante el procesamiento
 
 #-------------------CONSULTAR TODOS LOS USUARIOS-----------------------
 @app.route('/users', methods=['GET'])
@@ -69,8 +83,9 @@ def get_users():
         return jsonify(response_body), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
 
- #-------------------CONSULTAR TODOS LOS FAV -----------------------
+#-------------------CONSULTAR TODOS LOS FAV -----------------------
 @app.route('/favoritos', methods=['GET'])
 def get_favorites():
     try:
@@ -85,25 +100,25 @@ def get_favorites():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
- #-------------------CONSULTAR FAV DEL UN USUARIO-----------------------
- #https://fantastic-umbrella-695qvg7q9qvh5v9-3000.app.github.dev/users/favoritos?user_id=1
-@app.route('/users/favoritos', methods=['GET'])
-def get_user_favorites():
-    try:
-        user_id = request.args.get('user_id')
-        if not user_id:
-            return jsonify({'message': 'User ID is required'}), 400
+#-------------------CONSULTAR FAV DEL UN USUARIO-----------------------
 
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({'message': 'User not found'}), 404
+@app.route('/users/favoritos', methods=['GET'])  # Define una ruta '/users/favoritos?user_id=int' que responde a peticiones GET
+def get_user_favorites():  # Define una función llamada get_user_favorites()
+    try:  # Inicia un bloque try para manejar posibles excepciones
 
-        favoritos = user.favoritos
-        serialized_favoritos = [favorito.serialize() for favorito in favoritos]
-        return jsonify(serialized_favoritos), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    
+        user_id = request.args.get('user_id')  # Obtiene el parámetro 'user_id' de la solicitud GET
+        if not user_id:  # Verifica si 'user_id' no está presente
+            return jsonify({'message': 'User ID is required'}), 400  # Devuelve un mensaje de error con un código de estado HTTP 400 si 'user_id' no está presente
+
+        user = User.query.get(user_id)  # Busca un usuario en la base de datos según el 'user_id' proporcionado
+        if not user:  # Verifica si no se encontró ningún usuario con el 'user_id' proporcionado
+            return jsonify({'message': 'User not found'}), 404  # Devuelve un mensaje de error con un código de estado HTTP 404 si no se encuentra ningún usuario con el 'user_id' proporcionado
+
+        favoritos = user.favoritos  # Obtiene todos los favoritos del usuario encontrado
+        serialized_favoritos = [favorito.serialize() for favorito in favoritos]  # Serializa los favoritos del usuario en formato JSON
+        return jsonify(serialized_favoritos), 200  # Devuelve los favoritos serializados con un código de estado HTTP 200 si todo está correcto
+    except Exception as e:  # Captura cualquier excepción que ocurra dentro del bloque try
+        return jsonify({'error': str(e)}), 500  # Devuelve un mensaje de error con un código de estado HTTP 500 si ocurre una excepción durante el procesamiento
 
 #-------------------METODO POST USUARIO FAVORITO PLANET-----------------------
 
@@ -134,7 +149,6 @@ def add_favorite_planet(planet_id):  # Define la función que manejará la solic
     except Exception as e:  # Captura cualquier excepción que pueda ocurrir durante la ejecución del bloque try
         return jsonify({'error': str(e)}), 500  # Devuelve un error con código de estado 500 si ocurre una excepción, convirtiendo la excepción en una cadena de texto para la respuesta JSON
 
-
 #-------------------METODO POST USUARIO FAVORITO CHARACTER-----------------------
 
 @app.route('/favorite/character/<int:character_id>', methods=['POST'])  # Define un endpoint para agregar un character favorito mediante una solicitud POST a la ruta '/favorite/planet/<planet_id>'
@@ -163,7 +177,6 @@ def add_favorite_character(character_id):  # Define la función que manejará la
         return jsonify({'message': 'character added to favorites'}), 201  # Devuelve un mensaje de éxito con código de estado 201
     except Exception as e:  # Captura cualquier excepción que pueda ocurrir durante la ejecución del bloque try
         return jsonify({'error': str(e)}), 500  # Devuelve un error con código de estado 500 si ocurre una excepción, convirtiendo la excepción en una cadena de texto para la respuesta JSON
-
 
 #-------------------METODO DELETE PLANET DE UN USUARIO-----------------------
 
@@ -205,7 +218,6 @@ def remove_favorite_planet(planet_id):
         # Devuelve un error con código de estado 500 si ocurre una excepción
         return jsonify({'error': str(e)}), 500
 
-
 #-------------------METODO DELETE CHARACTERS DE UN USUARIO-----------------------
 
 @app.route('/favorite/character/<int:character_id>', methods=['DELETE'])
@@ -245,7 +257,6 @@ def remove_favorite_character(character_id):
     except Exception as e:
         # Devuelve un error con código de estado 500 si ocurre una excepción
         return jsonify({'error': str(e)}), 500
-
 
 #-----------------------------------------------------------METODOS PARA CHARACTERS-------------------------------------------------------------
 

@@ -24,7 +24,7 @@ class User(db.Model):  # Definir una clase que hereda de la clase Model de SQLAl
     #favorito_id = db.Column(db.Integer, db.ForeignKey('favoritos.id'))  # Corrección: db.Column en lugar de db.column
     email = db.Column(db.String(120), unique=True, nullable=False)  # Definir una columna de tipo string con restricciones de unicidad y no nulidad
     password = db.Column(db.String(80), unique=False, nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)  # Definir una columna de tipo booleano con restricciones de no nulidad
+    is_active = db.Column(db.Boolean(), unique=False, nullable=True)  # Definir una columna de tipo booleano con restricciones de no nulidad
     username = db.Column(db.String(80), unique=True, nullable=False)  # Definir una columna de tipo string con restricciones de unicidad y no nulidad
     name = db.Column(db.String(80), unique=False, nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
     last_name = db.Column(db.String(80), unique=False, nullable=False)  # Definir una columna de tipo string con restricciones de no nulidad
